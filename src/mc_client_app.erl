@@ -23,37 +23,43 @@ startClient() ->
 readInput(Socket) -> 
     % read input
     {ok, Input} = io:read(">>"),
-    case Input of 
-        % command list
-        {help} ->
-            help();
-        % room list
-        {rooms} ->
-            rooms(Socket);
-        % room users list
-        {users_room, Room} ->
-            usersRoom(Socket, Room);
-        % create room
-        {create_room, Room} ->
-            createRoom(Socket, Room);
-        % enter room
-        {enter_room, Room} ->
-            enterRoom(Socket, Room);
-        {exit_room, Room} ->
-            exitRoom(Socket, Room);
-        % quit client
-        {quit} ->
-            quit(Socket);
-        % send message to room
-        {send_room, Room, Message} ->
-            sendRoom(Socket, Room, Message);
-        % send private message 
-        {send_private, User, Message} ->
-            sendPrivate(Socket, User, Message);
-        % register name
-        {register, Name} ->
-            registerName(Socket, Name)
-    end,
+    try
+        case Input of 
+            % command list
+            {help} ->
+                help();
+            % room list
+            {rooms} ->
+                rooms(Socket);
+            % room users list
+            {users_room, Room} ->
+                usersRoom(Socket, Room);
+            % create room
+            {create_room, Room} ->
+                createRoom(Socket, Room);
+            % enter room
+            {enter_room, Room} ->
+                enterRoom(Socket, Room);
+            {exit_room, Room} ->
+                exitRoom(Socket, Room);
+            % quit client
+            {quit} ->
+                quit(Socket);
+            % send message to room
+            {send_room, Room, Message} ->
+                sendRoom(Socket, Room, Message);
+            % send private message 
+            {send_private, User, Message} ->
+                sendPrivate(Socket, User, Message);
+            % register name
+            {register, Name} ->
+                registerName(Socket, Name)
+        end
+    catch
+        error:Error-> 
+            io:format("[SYSTEM] command not found, type {help} to get a list of available commands~n"),
+            {error, Error}
+    end,   
     readInput(Socket).
 
 connect() -> 
@@ -69,15 +75,15 @@ connect() ->
 
 help() -> 
     Rooms = "{rooms}: get a list of all available rooms",
-    RegisterName = "{register_name, '<name>'}: get your username",
-    SendRoom = "{send_room, '<room>', '<message>'}: send a message in a room",
-    SendPrivate = "{send_private, '<user>', '<message>'}: send a message to a user",
-    CreateRoom = "{create_room, '<room>'}: create a room",
-    UsersRoom = "{users_room, '<room>'}: get a list of users in a room",
-    ExitRoom = "{exit_room, '<room>'}: exit room",
-    EnterRoom = "{enter_room, '<room>'}: enter room",
+    RegisterName = "{register_name, \"<name>\"}: get your username",
+    SendRoom = "{send_room, \"<room>\", \"<message>\"}: send a message in a room",
+    SendPrivate = "{send_private, \"<user>\", \"<message>\"}: send a message to a user",
+    CreateRoom = "{create_room, \"<room>\"}: create a room",
+    UsersRoom = "{users_room, \"<room>\"}: get a list of users in a room",
+    ExitRoom = "{exit_room, \"<room>\"}: exit room",
+    EnterRoom = "{enter_room, \"<room>\"}: enter room",
     io:format("~n~n"),
-    io:format("\r[SYSTEM] here a list of available commands:~n~p~n~p~n~p~n~p~n~p~n~p~n~p~n~p~n", [Rooms, RegisterName, SendRoom, SendPrivate, CreateRoom, UsersRoom, ExitRoom, EnterRoom]),
+    io:format("\r[SYSTEM] here a list of available commands:~n~s~n~s~n~s~n~s~n~s~n~s~n~s~n~s~n", [Rooms, RegisterName, SendRoom, SendPrivate, CreateRoom, UsersRoom, ExitRoom, EnterRoom]),
     io:format("~n~n").
 
 quit(Socket) ->
