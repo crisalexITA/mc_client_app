@@ -33,27 +33,27 @@ readInput(Socket) ->
                 rooms(Socket);
             % room users list
             {users_room, Room} ->
-                usersRoom(Socket, Room);
+                usersRoom(Socket, cast2String(Room));
             % create room
             {create_room, Room} ->
-                createRoom(Socket, Room);
+                createRoom(Socket, cast2String(Room));
             % enter room
             {enter_room, Room} ->
-                enterRoom(Socket, Room);
+                enterRoom(Socket, cast2String(Room));
             {exit_room, Room} ->
-                exitRoom(Socket, Room);
+                exitRoom(Socket, cast2String(Room));
             % quit client
             {quit} ->
                 quit(Socket);
             % send message to room
             {send_room, Room, Message} ->
-                sendRoom(Socket, Room, Message);
+                sendRoom(Socket, cast2String(Room), cast2String(Message));
             % send private message 
             {send_private, User, Message} ->
-                sendPrivate(Socket, User, Message);
+                sendPrivate(Socket, cast2String(User), cast2String(Message));
             % register name
             {register, Name} ->
-                registerName(Socket, Name)
+                registerName(Socket, cast2String(Name))
         end
     catch
         error:Error-> 
@@ -118,3 +118,9 @@ exitRoom(Socket, Room) ->
 
 enterRoom(Socket, Room) ->
     gen_tcp:send(Socket, term_to_binary({enter_room, Room})).
+
+cast2String(Variable) ->
+    case is_atom(Variable) of
+        true -> atom_to_list(Variable);
+        false -> Variable
+    end.
