@@ -87,7 +87,8 @@ help() ->
     io:format("~n~n").
 
 quit(Socket) ->
-    gen_tcp:close(Socket),
+    gen_tcp:send(Socket, term_to_binary({quit})),
+    io:format("Bye~n"),
     exit(self(), quit).
 
 recv(Socket) ->
